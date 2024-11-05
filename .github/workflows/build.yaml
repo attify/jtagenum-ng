@@ -1,0 +1,44 @@
+name: Build for Rpi 5 (Linux 64 bit)
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install prerequisites
+        run: sudo apt update && sudo apt install --yes build-essential gcc-aarch64-linux-gnu
+
+      - name: Build Rust part
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-unknown-linux-gnu
+      - run: |
+          cd driver_rppal
+          cargo build --release --target=aarch64-unknown-linux-gnu
+
+
+      - name: Build Go part
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - run: |
+          cd go-jtagenum
+          CGO_ENABLED=1 CC=aarch64-linux-gnu-gcc GOOS=linux GOARCH=arm64 go build -ldflags="-w -s"
+
+
+      - name: Set release date
+        run: echo "RELEASE_DATE=$(date -u +%Y.%m.%d)" >> ${GITHUB_ENV}
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          name: ${{ env.RELEASE_DATE }}
+          tag:  ${{ env.RELEASE_DATE }}
+          artifacts: "go-jtagenum/go-jtagenum"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          allowUpdates: true
+          draft: true
