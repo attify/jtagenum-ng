@@ -10,7 +10,7 @@ Precompiled binaries are provided in Releases. Otherwise for compiling from sour
 
 Please refer to the original project for more details: https://github.com/gremwell/go-jtagenum?tab=readme-ov-file#usage
 
-## Changes compared to the Go-JTAGenum
+## Changes compared to Go-JTAGenum
 
 - Removed the go-rpio driver as it doesn't support RPi 5.
 - Removed the libgpiod driver. This driver does work with Pi 5 but requires the `libgpiod-dev` package to be installed on the Pi. Also linking against the libraries can be tricky specifically when cross-compiling on a x86_64 host.
